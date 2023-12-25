@@ -20,6 +20,7 @@ namespace ScreenCapture
             view.MouseMove += MainForm_MouseMove;
             view.MouseUp += MainForm_MouseUp;
             view.Paint += MainForm_Paint;
+            view.KeyDown += MainForm_KeyDown;
         }
 
         private void MainForm_MouseDown(object sender, MouseEventArgs e)
@@ -29,7 +30,7 @@ namespace ScreenCapture
 
         private void MainForm_MouseMove(object sender, MouseEventArgs e)
         {
-            if (e.Button == MouseButtons.Left)
+            if (e.Button == MouseButtons.Left || e.Button == MouseButtons.Right)
             {
                 model.UpdateDrag(e.Location);
                 view.Invalidate();
@@ -40,15 +41,33 @@ namespace ScreenCapture
         {
             if (e.Button == MouseButtons.Left)
             {
-                OnDragComplete(e);
+                OnLeftMouseDragComplete(e);
             }
+            else if(e.Button == MouseButtons.Right)
+            {
+                OnRightMouseDragComplete(e);
+            } 
         }
 
-        private void OnDragComplete(MouseEventArgs e)
+        private void OnLeftMouseDragComplete(MouseEventArgs e)
         {
-            Bitmap screenshot = model.GetScreenshot();
-            Clipboard.SetImage(screenshot);
+            Bitmap? screenshot = model.GetScreenshot();
 
+            try
+            {
+                Clipboard.SetImage(screenshot);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Screenshot is null! \n {ex}");
+            }
+
+            model.ResetSelection();
+            view.Invalidate();
+        }
+
+        private void OnRightMouseDragComplete(MouseEventArgs e)
+        {
             model.ResetSelection();
             view.Invalidate();
         }
@@ -58,6 +77,14 @@ namespace ScreenCapture
             using (Pen pen = new Pen(Color.White, 2))
             {
                 e.Graphics.DrawRectangle(pen, model.SelectedRegion);
+            }
+        }
+
+        private void MainForm_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Escape)
+            {
+                Application.Exit();
             }
         }
     }

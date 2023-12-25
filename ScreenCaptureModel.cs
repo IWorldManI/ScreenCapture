@@ -22,16 +22,24 @@ namespace ScreenCapture
                                           currentPoint.X - SelectedRegion.Left, currentPoint.Y - SelectedRegion.Top);
         }
 
-        public Bitmap GetScreenshot()
+        public Bitmap? GetScreenshot()
         {
-            Bitmap screenBmp = new Bitmap(SelectedRegion.Width, SelectedRegion.Height, PixelFormat.Format32bppArgb);
-
-            using (Graphics bmpGraphics = Graphics.FromImage(screenBmp))
+            try
             {
-                bmpGraphics.CopyFromScreen(SelectedRegion.Left, SelectedRegion.Top, 0, 0, new Size(SelectedRegion.Width, SelectedRegion.Height));
-            }
+                Bitmap screenBmp = new Bitmap(SelectedRegion.Width, SelectedRegion.Height, PixelFormat.Format32bppArgb);
 
-            return screenBmp;
+                using (Graphics bmpGraphics = Graphics.FromImage(screenBmp))
+                {
+                    bmpGraphics.CopyFromScreen(SelectedRegion.Left, SelectedRegion.Top, 0, 0, new Size(SelectedRegion.Width, SelectedRegion.Height));
+                }
+
+                return screenBmp;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"ArgumentException: {ex.Message}");
+                return null;
+            }
         }
 
         public void ResetSelection()
