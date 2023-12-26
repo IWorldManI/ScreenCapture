@@ -5,6 +5,10 @@ using System.Windows.Forms;
 
 namespace ScreenCapture
 {
+    /// <summary>
+    /// Main form for the ScreenCapture application, allowing users to capture a selected region of the screen.
+    /// Utilizes the ScreenCaptureModel and ScreenCaptureController for managing the capture process.
+    /// </summary>
     public partial class MainForm : Form
     {
         private ScreenCaptureModel model;

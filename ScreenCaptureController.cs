@@ -7,19 +7,26 @@ using System.Threading.Tasks;
 
 namespace ScreenCapture
 {
+    /// <summary>
+    /// Controller for managing screen capture functionality in the ScreenCapture application.
+    /// Handles user interactions, recording, and GIF creation.
+    /// </summary>
     public class ScreenCaptureController
     {
-        private ScreenCaptureModel model;
-        private MainForm view;
-
         #region Fields
         private int defaultFrameDelay = 100;
         private string filePath = "captured_screen.gif";
+        private int buttonOffset = 10;
         #endregion
 
-        private GifWriter gifWriter { get; set; }
-        private CancellationTokenSource recordingCancellationTokenSource { get; set; }
+        private ScreenCaptureModel model;
+        private MainForm view;
+        private GifWriter gifWriter;
+        private CancellationTokenSource recordingCancellationTokenSource;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ScreenCaptureController"/> class.
+        /// </summary>
         public ScreenCaptureController(ScreenCaptureModel model, MainForm view)
         {
             this.model = model;
@@ -32,12 +39,11 @@ namespace ScreenCapture
             view.KeyDown += MainForm_KeyDown;
             view.stopButton.Click += MainForm_StopRecording;
 
-            gifWriter = new GifWriter(filePath, defaultFrameDelay, 0);
-
+            gifWriter = new GifWriter(filePath, defaultFrameDelay, 0); // Repeat enable
             recordingCancellationTokenSource = new CancellationTokenSource();
         }
 
-        private void MainForm_MouseDown(object sender, MouseEventArgs e)
+        private void MainForm_MouseDown(object? sender, MouseEventArgs e)
         {
             switch (e.Button)
             {
@@ -54,7 +60,7 @@ namespace ScreenCapture
             }
         }
 
-        private void MainForm_MouseMove(object sender, MouseEventArgs e)
+        private void MainForm_MouseMove(object? sender, MouseEventArgs e)
         {
             switch (e.Button)
             {
@@ -73,7 +79,7 @@ namespace ScreenCapture
             }
         }
 
-        private void MainForm_MouseUp(object sender, MouseEventArgs e)
+        private void MainForm_MouseUp(object? sender, MouseEventArgs e)
         {
             switch (e.Button)
             {
@@ -98,9 +104,11 @@ namespace ScreenCapture
             {
                 Clipboard.SetImage(screenshot);
             }
-            catch (Exception ex)
+            catch
             {
-                // MessageBox.Show($"Screenshot is null! \n {ex}"); 
+                // Log the exception for further analysis
+                // Optionally, display a user-friendly message or handle the exception as needed
+                // MessageBox.Show($"Error: {ex.Message}");
             }
 
             model.ResetSelection();
@@ -109,12 +117,12 @@ namespace ScreenCapture
 
         private async void OnRightMouseDragComplete(MouseEventArgs e)
         {
-            int offset = 10;
             view.stopButton.Visible = true;
-            view.stopButton.Location = model.CalculateStopButtonLocation(view, offset);
-            await model.RecordGifAsync(gifWriter,recordingCancellationTokenSource.Token);
+            view.stopButton.Location = model.CalculateStopButtonLocation(view, buttonOffset);
+            await model.RecordGifAsync(gifWriter, recordingCancellationTokenSource.Token, defaultFrameDelay);
         }
-        private void MainForm_Paint(object sender, PaintEventArgs e)
+
+        private void MainForm_Paint(object? sender, PaintEventArgs e)
         {
             using (Pen pen = new Pen(Color.White, 2))
             {
@@ -122,7 +130,7 @@ namespace ScreenCapture
             }
         }
 
-        private void MainForm_KeyDown(object sender, KeyEventArgs e)
+        private void MainForm_KeyDown(object? sender, KeyEventArgs e)
         {
             if (e.KeyCode == Keys.Escape)
             {
@@ -130,7 +138,10 @@ namespace ScreenCapture
             }
         }
 
-        private void MainForm_StopRecording(object sender, EventArgs e)
+        /// <summary>
+        /// Handles the click event of the stop button to stop recording.
+        /// </summary>
+        private void MainForm_StopRecording(object? sender, EventArgs e)
         {
             recordingCancellationTokenSource.Cancel();
 

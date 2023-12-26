@@ -3,6 +3,9 @@ using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
 
+/// <summary>
+/// Class for writing GIF files, supporting animated frames.
+/// </summary>
 public class GifWriter : IDisposable
 {
     private const long SourceGlobalColorInfoPosition = 10;

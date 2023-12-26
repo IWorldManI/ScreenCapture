@@ -6,6 +6,9 @@ using System.Windows.Forms;
 
 namespace ScreenCapture
 {
+    /// <summary>
+    /// Model class for managing screen capture operations in the ScreenCapture application.
+    /// </summary>
     public class ScreenCaptureModel
     {
         private Point dragStartPoint { get; set; }
@@ -17,6 +20,9 @@ namespace ScreenCapture
             SelectedRegion = new Rectangle(startPoint.X, startPoint.Y, 0, 0);
         }
 
+        /// <summary>
+        /// Updates the drag operation based on the current mouse position.
+        /// </summary>
         public void UpdateDrag(Point currentPoint)
         {
             int x = Math.Min(dragStartPoint.X, currentPoint.X);
@@ -27,6 +33,9 @@ namespace ScreenCapture
             SelectedRegion = new Rectangle(x, y, width, height);
         }
 
+        /// <summary>
+        /// Captures and returns a screenshot of the selected region.
+        /// </summary>
         public Bitmap? GetScreenshot()
         {
             try
@@ -47,7 +56,7 @@ namespace ScreenCapture
             }
         }
 
-        public async Task RecordGifAsync(GifWriter gifWriter, CancellationToken recordingCancellationTokenSource)
+        public async Task RecordGifAsync(GifWriter gifWriter, CancellationToken recordingCancellationTokenSource, int defaultFrameDelay)
         {
             try
             {
@@ -62,7 +71,7 @@ namespace ScreenCapture
                         }
                     }
 
-                    await Task.Delay(100);
+                    await Task.Delay(defaultFrameDelay);
                 }
             }
             catch (Exception ex)
@@ -71,6 +80,12 @@ namespace ScreenCapture
             }
         }
 
+        /// <summary>
+        /// Calculates the location for the stop button relative to the selected region.
+        /// </summary>
+        /// <param name="view">The MainForm instance containing the stop button.</param>
+        /// <param name="offset">The offset from the selected region.</param>
+        /// <returns>The calculated location for the stop button.</returns>
         public Point CalculateStopButtonLocation(MainForm view,int offset)
         {
             int buttonX = SelectedRegion.Right + offset;
@@ -94,6 +109,9 @@ namespace ScreenCapture
             return new Point(buttonX, buttonY);
         }
 
+        /// <summary>
+        /// Resets the selected region to an empty rectangle.
+        /// </summary>
         public void ResetSelection()
         {
             SelectedRegion = Rectangle.Empty;
