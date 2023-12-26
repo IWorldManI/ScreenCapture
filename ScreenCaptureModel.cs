@@ -1,25 +1,30 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Drawing;
 using System.Drawing.Imaging;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Reflection;
+using System.Windows.Forms;
 
 namespace ScreenCapture
 {
     public class ScreenCaptureModel
     {
+        private Point dragStartPoint { get; set; }
         public Rectangle SelectedRegion { get; private set; }
 
         public void StartDrag(Point startPoint)
         {
+            dragStartPoint = startPoint;
             SelectedRegion = new Rectangle(startPoint.X, startPoint.Y, 0, 0);
         }
 
         public void UpdateDrag(Point currentPoint)
         {
-            SelectedRegion = new Rectangle(SelectedRegion.Left, SelectedRegion.Top,
-                                          currentPoint.X - SelectedRegion.Left, currentPoint.Y - SelectedRegion.Top);
+            int x = Math.Min(dragStartPoint.X, currentPoint.X);
+            int y = Math.Min(dragStartPoint.Y, currentPoint.Y);
+            int width = Math.Abs(currentPoint.X - dragStartPoint.X);
+            int height = Math.Abs(currentPoint.Y - dragStartPoint.Y);
+
+            SelectedRegion = new Rectangle(x, y, width, height);
         }
 
         public Bitmap? GetScreenshot()
@@ -40,6 +45,53 @@ namespace ScreenCapture
                 Console.WriteLine($"ArgumentException: {ex.Message}");
                 return null;
             }
+        }
+
+        public async Task RecordGifAsync(GifWriter gifWriter, CancellationToken recordingCancellationTokenSource)
+        {
+            try
+            {
+                while (!recordingCancellationTokenSource.IsCancellationRequested)
+                {
+                    using (Image? screenshot = GetScreenshot())
+                    {
+                        if (screenshot != null)
+                        {
+                            gifWriter.WriteFrame(screenshot);
+                            gifWriter.Flush();
+                        }
+                    }
+
+                    await Task.Delay(100);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Ошибка записи GIF: {ex.Message}");
+            }
+        }
+
+        public Point CalculateStopButtonLocation(MainForm view,int offset)
+        {
+            int buttonX = SelectedRegion.Right + offset;
+            int buttonY = SelectedRegion.Top;
+
+            if (buttonX + view.stopButton.Width > Screen.PrimaryScreen.Bounds.Width)
+            {
+                buttonX = SelectedRegion.Left - view.stopButton.Width - offset;
+            }
+
+            if (buttonY + view.stopButton.Height > Screen.PrimaryScreen.Bounds.Height)
+            {
+                buttonY = Screen.PrimaryScreen.Bounds.Height - view.stopButton.Height;
+            }
+
+            if (buttonY < 0)
+            {
+                buttonY = 0;
+            }
+
+            return new Point(buttonX, buttonY);
         }
 
         public void ResetSelection()

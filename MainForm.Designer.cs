@@ -28,18 +28,32 @@
         /// </summary>
         private void InitializeComponent()
         {
+            stopButton = new Button();
             SuspendLayout();
+            // 
+            // stopButton
+            // 
+            stopButton.Location = new Point(356, 308);
+            stopButton.Name = "stopButton";
+            stopButton.Size = new Size(75, 23);
+            stopButton.TabIndex = 0;
+            stopButton.Text = "Stop";
+            stopButton.UseVisualStyleBackColor = true;
+            stopButton.Visible = false;
             // 
             // MainForm
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(800, 450);
+            Controls.Add(stopButton);
             Name = "MainForm";
             Text = "Form1";
             ResumeLayout(false);
         }
 
         #endregion
+
+        public Button stopButton;
     }
 }

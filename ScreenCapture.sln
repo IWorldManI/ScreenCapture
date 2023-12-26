@@ -5,11 +5,6 @@ VisualStudioVersion = 17.5.33530.505
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ScreenCapture", "ScreenCapture.csproj", "{86696DA5-915D-4944-96DE-6AC96BF262DC}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Элементы решения", "Элементы решения", "{74FDD082-615E-46C1-9E74-29A07EF4D100}"
-	ProjectSection(SolutionItems) = preProject
-		ScreenCaptureController = ScreenCaptureController
-	EndProjectSection
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU

@@ -5,11 +5,10 @@ using System.Windows.Forms;
 
 namespace ScreenCapture
 {
-    using System.Drawing.Imaging;
-
     public partial class MainForm : Form
     {
         private ScreenCaptureModel model;
+        private ScreenCaptureController screenCaptureController;
 
         public MainForm()
         {
@@ -17,7 +16,7 @@ namespace ScreenCapture
             SetupWindowParameters();
 
             model = new ScreenCaptureModel();
-            new ScreenCaptureController(model, this);
+            screenCaptureController = new ScreenCaptureController(model, this);
         }
 
         private void MainForm_Paint(object sender, PaintEventArgs e)
@@ -30,6 +29,7 @@ namespace ScreenCapture
 
         private void SetupWindowParameters()
         {
+            TopMost = true;
             FormBorderStyle = FormBorderStyle.None;
             WindowState = FormWindowState.Maximized;
 
