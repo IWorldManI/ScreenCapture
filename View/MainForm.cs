@@ -2,6 +2,8 @@ using System;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.Windows.Forms;
+using ScreenCapture.Controller;
+using ScreenCapture.Model;
 
 namespace ScreenCapture
 {
@@ -38,7 +40,7 @@ namespace ScreenCapture
             WindowState = FormWindowState.Maximized;
 
             SetStyle(ControlStyles.SupportsTransparentBackColor, true);
-            BackColor = Color.Red;
+            BackColor = Color.Blue;
             TransparencyKey = BackColor;
             DoubleBuffered = true;
         }

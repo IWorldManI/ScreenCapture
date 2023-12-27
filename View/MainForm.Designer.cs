@@ -33,6 +33,7 @@
             // 
             // stopButton
             // 
+            stopButton.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
             stopButton.Location = new Point(356, 308);
             stopButton.Name = "stopButton";
             stopButton.Size = new Size(75, 23);

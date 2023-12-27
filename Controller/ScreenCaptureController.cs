@@ -1,11 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Drawing.Imaging;
-using System.Linq;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
+﻿using ScreenCapture.Model;
 
-namespace ScreenCapture
+namespace ScreenCapture.Controller
 {
     /// <summary>
     /// Controller for managing screen capture functionality in the ScreenCapture application.
@@ -93,7 +88,7 @@ namespace ScreenCapture
 
                 default:
                     break;
-            } 
+            }
         }
 
         private void OnLeftMouseDragComplete(MouseEventArgs e)

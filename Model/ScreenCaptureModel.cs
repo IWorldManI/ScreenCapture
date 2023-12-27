@@ -1,10 +1,6 @@
-﻿using System;
-using System.Drawing;
-using System.Drawing.Imaging;
-using System.Reflection;
-using System.Windows.Forms;
+﻿using System.Drawing.Imaging;
 
-namespace ScreenCapture
+namespace ScreenCapture.Model
 {
     /// <summary>
     /// Model class for managing screen capture operations in the ScreenCapture application.
@@ -86,7 +82,7 @@ namespace ScreenCapture
         /// <param name="view">The MainForm instance containing the stop button.</param>
         /// <param name="offset">The offset from the selected region.</param>
         /// <returns>The calculated location for the stop button.</returns>
-        public Point CalculateStopButtonLocation(MainForm view,int offset)
+        public Point CalculateStopButtonLocation(MainForm view, int offset)
         {
             int buttonX = SelectedRegion.Right + offset;
             int buttonY = SelectedRegion.Top;

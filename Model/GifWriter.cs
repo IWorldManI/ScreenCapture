@@ -1,7 +1,4 @@
-﻿using System;
-using System.Drawing;
-using System.Drawing.Imaging;
-using System.IO;
+﻿using System.Drawing.Imaging;
 
 /// <summary>
 /// Class for writing GIF files, supporting animated frames.
