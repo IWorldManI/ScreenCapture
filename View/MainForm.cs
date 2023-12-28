@@ -31,13 +31,30 @@ namespace ScreenCapture
         {
             TopMost = true;
             FormBorderStyle = FormBorderStyle.None;
-            WindowState = FormWindowState.Maximized;
 
             SetStyle(ControlStyles.SupportsTransparentBackColor, true);
             BackColor = Color.Blue;
             TransparencyKey = BackColor;
             DoubleBuffered = true;
             ShowInTaskbar = true;
+
+            Screen[] screens = Screen.AllScreens;
+
+            if (screens.Length > 1)
+            {
+                int totalWidth = Math.Abs(screens[0].Bounds.Left) + screens[0].Bounds.Width + screens[1].Bounds.Width;
+                int totalHeight = Math.Max(screens[0].Bounds.Height, screens[1].Bounds.Height);
+
+                this.Width = totalWidth;
+                this.Height = totalHeight;
+
+                this.StartPosition = FormStartPosition.Manual;
+                this.Location = new System.Drawing.Point(Math.Min(screens[0].Bounds.Left, screens[1].Bounds.Left), screens[0].Bounds.Top);
+            }
+            else
+            {
+                WindowState = FormWindowState.Maximized;
+            }
         }
     }
 }
