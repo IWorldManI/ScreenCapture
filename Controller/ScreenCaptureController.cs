@@ -8,16 +8,10 @@ namespace ScreenCapture.Controller
     /// </summary>
     public class ScreenCaptureController
     {
-        #region Fields
-        private int defaultFrameDelay = 100;
-        private string filePath = "captured_screen.gif";
-        private int buttonOffset = 10;
-        #endregion
-
         private ScreenCaptureModel model;
         private MainForm view;
-        private GifWriter gifWriter;
-        private CancellationTokenSource recordingCancellationTokenSource;
+        private ToolTip mouseTooltip;
+        private MousePressedEnum mousePressed { get; set; }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ScreenCaptureController"/> class.
@@ -26,6 +20,7 @@ namespace ScreenCapture.Controller
         {
             this.model = model;
             this.view = view;
+            this.mouseTooltip = new ToolTip();
 
             view.MouseDown += MainForm_MouseDown;
             view.MouseMove += MainForm_MouseMove;
@@ -34,43 +29,58 @@ namespace ScreenCapture.Controller
             view.KeyDown += MainForm_KeyDown;
             view.stopButton.Click += MainForm_StopRecording;
 
-            gifWriter = new GifWriter(filePath, defaultFrameDelay, 0); // Repeat enable
-            recordingCancellationTokenSource = new CancellationTokenSource();
+            mousePressed = MousePressedEnum.None;
         }
 
         private void MainForm_MouseDown(object? sender, MouseEventArgs e)
         {
-            switch (e.Button)
+            if (mousePressed == MousePressedEnum.None && !model.IsRecording)
             {
-                case MouseButtons.Left:
-                    model.StartDrag(e.Location);
-                    break;
+                switch (e.Button)
+                {
+                    case MouseButtons.Left:
+                        model.StartDrag(e.Location);
+                        mousePressed = MousePressedEnum.Left;
+                        break;
 
-                case MouseButtons.Right:
-                    model.StartDrag(e.Location);
-                    break;
+                    case MouseButtons.Right:
+                        model.StartDrag(e.Location);
+                        mousePressed = MousePressedEnum.Right;
+                        break;
 
-                default:
-                    break;
+                    default:
+                        break;
+                }
             }
         }
 
         private void MainForm_MouseMove(object? sender, MouseEventArgs e)
         {
-            switch (e.Button)
+            if (!model.IsRecording)
             {
-                case MouseButtons.Left:
-                    model.UpdateDrag(e.Location);
-                    view.Invalidate();
-                    break;
+                switch (e.Button)
+                {
+                    case MouseButtons.Left:
+                    case MouseButtons.Right:
+                        model.UpdateDrag(e.Location);
+                        view.Invalidate();
+                        break;
 
-                case MouseButtons.Right:
-                    model.UpdateDrag(e.Location);
-                    view.Invalidate();
-                    break;
+                    default:
+                        break;
+                }
+            }
 
-                default:
-                    break;
+            bool showTooltip = !model.IsRecording && mousePressed == MousePressedEnum.None;
+
+            if (showTooltip)
+            {
+                mouseTooltip.ShowAlways = true;
+                mouseTooltip.Show(model.ToolTipMessage, view, model.CalculateToolTipLocation(view, e));
+            }
+            else
+            {
+                mouseTooltip.Hide(view);
             }
         }
 
@@ -79,11 +89,13 @@ namespace ScreenCapture.Controller
             switch (e.Button)
             {
                 case MouseButtons.Left:
-                    OnLeftMouseDragComplete(e);
+                    if(mousePressed == MousePressedEnum.Left)
+                        OnLeftMouseDragComplete(e);
                     break;
 
                 case MouseButtons.Right:
-                    OnRightMouseDragComplete(e);
+                    if (mousePressed == MousePressedEnum.Right && !model.IsRecording)
+                        OnRightMouseDragComplete(e);
                     break;
 
                 default:
@@ -105,16 +117,34 @@ namespace ScreenCapture.Controller
                 // Optionally, display a user-friendly message or handle the exception as needed
                 // MessageBox.Show($"Error: {ex.Message}");
             }
-
-            model.ResetSelection();
-            view.Invalidate();
+            finally
+            {
+                CleanUp();
+            }
         }
 
         private async void OnRightMouseDragComplete(MouseEventArgs e)
         {
-            view.stopButton.Visible = true;
-            view.stopButton.Location = model.CalculateStopButtonLocation(view, buttonOffset);
-            await model.RecordGifAsync(gifWriter, recordingCancellationTokenSource.Token, defaultFrameDelay);
+            try
+            {
+                if(model.DeleteExistingFile)
+                    model.DeleteFile();
+
+                view.stopButton.Visible = true;
+                view.stopButton.Location = model.CalculateStopButtonLocation(view, model.ButtonOffset);
+
+                await model.RecordGifAsync(model.DefaultFrameDelay);
+            }
+            catch
+            {
+                // Log the exception for further analysis
+                // Optionally, display a user-friendly message or handle the exception as needed
+                // MessageBox.Show($"Error: {ex.Message}");
+            }
+            finally
+            {
+                CleanUp();
+            }
         }
 
         private void MainForm_Paint(object? sender, PaintEventArgs e)
@@ -138,8 +168,13 @@ namespace ScreenCapture.Controller
         /// </summary>
         private void MainForm_StopRecording(object? sender, EventArgs e)
         {
-            recordingCancellationTokenSource.Cancel();
+            model.DisposeRecorder();
+            CleanUp();
+        }
 
+        private void CleanUp()
+        {
+            mousePressed = MousePressedEnum.None;
             view.stopButton.Visible = false;
             model.ResetSelection();
             view.Invalidate();

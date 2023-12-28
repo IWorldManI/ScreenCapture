@@ -15,6 +15,7 @@ namespace ScreenCapture
     {
         private ScreenCaptureModel model;
         private ScreenCaptureController screenCaptureController;
+        private ToolTip mainToolTipMessage;
 
         public MainForm()
         {
@@ -22,15 +23,8 @@ namespace ScreenCapture
             SetupWindowParameters();
 
             model = new ScreenCaptureModel();
+            mainToolTipMessage = new ToolTip();
             screenCaptureController = new ScreenCaptureController(model, this);
-        }
-
-        private void MainForm_Paint(object sender, PaintEventArgs e)
-        {
-            using (Pen pen = new Pen(Color.White, 2))
-            {
-                e.Graphics.DrawRectangle(pen, model.SelectedRegion);
-            }
         }
 
         private void SetupWindowParameters()
@@ -43,6 +37,7 @@ namespace ScreenCapture
             BackColor = Color.Blue;
             TransparencyKey = BackColor;
             DoubleBuffered = true;
+            ShowInTaskbar = true;
         }
     }
 }
