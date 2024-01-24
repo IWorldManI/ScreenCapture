@@ -17,4 +17,4 @@ ScreenCapture is a simple MVC (Model-View-Controller) application that allows us
 This project is licensed under the MIT License.
 
 ## Contact
-For any inquiries, please contact me at rudenko_roman@outlook.com
+For any inquiries, please contact me at rudenko.r.i15@gmail.com
